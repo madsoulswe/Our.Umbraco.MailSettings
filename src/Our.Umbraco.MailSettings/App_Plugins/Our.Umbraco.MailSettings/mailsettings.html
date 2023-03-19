@@ -1,0 +1,70 @@
+<div ng-controller="MailSettings.Controller as vm">
+
+    <div class="flex justify-between">
+        <div class="flx-b5 mr2">
+            <umb-box>
+
+                <umb-box-content>
+                    <umb-loader ng-if="vm.loading"></umb-loader>
+                    <form ng-if="!vm.loading" name="doctyperender" class="form-horizontal" novalidate val-form-manager>
+
+
+                        <div class="form-group" ng-repeat="property in  vm.smtpProperties">
+                            <umb-property property="property">
+                                <umb-property-editor model="property"></umb-property-editor>
+                            </umb-property>
+                        </div>
+
+
+                        <div class="tr">
+                            <umb-button action="vm.saveSettings()"
+                                        label="Save"
+                                        type="button"
+                                        state="vm.savingState"
+                                        button-style="info">
+                            </umb-button>
+
+                            <umb-button action="vm.saveSettings(true)"
+                                        label="Save to current environment"
+                                        type="button"
+                                        state="vm.savingState"
+                                        button-style="success">
+                            </umb-button>
+                        </div>
+                    </form>
+                </umb-box-content>
+
+
+            </umb-box>
+        </div>
+
+        <div class="flx-b5">
+            <umb-box>
+
+                <umb-box-content>
+                    <form ng-if="!vm.loading" name="doctyperender" class="form-horizontal" novalidate val-form-manager>
+                        <div class="form-group" ng-repeat="property in  vm.testProperties">
+                            <umb-property property="property">
+                                <umb-property-editor model="property"></umb-property-editor>
+                            </umb-property>
+                        </div>
+
+                        <div class="tr">
+                            <umb-button action="vm.sendTest()"
+                                        label="Send"
+                                        type="button"
+                                        state="vm.testState"
+                                        button-style="success">
+                            </umb-button>
+                        </div>
+                    </form>
+                </umb-box-content>
+
+
+            </umb-box>
+        </div>
+
+
+    </div>
+    
+</div>

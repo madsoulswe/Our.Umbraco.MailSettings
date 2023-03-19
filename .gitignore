@@ -1,0 +1,8 @@
+﻿src/.vs
+src/node_modules
+.vs
+bin
+src/Our.Umbraco.MailSettings/obj
+src/Our.Umbraco.MailSettings.WebsiteV10/App_Plugins/Our.Umbraco.MailSettings
+src/Our.Umbraco.MailSettings.WebsiteV10/appsettings.Development.json
+src/Our.Umbraco.MailSettings.WebsiteV10/appsettings.json

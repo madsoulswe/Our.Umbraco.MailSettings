@@ -1,0 +1,24 @@
+﻿{
+  "name": "Our.Umbraco.MailSettings",
+  "version": "",
+  "allowPackageTelemetry": true,
+  "dashboards": [
+    {
+      "alias": "mailSettings",
+      "view": "/App_Plugins/Our.Umbraco.MailSettings/mailsettings.html",
+      "sections": [ "settings" ],
+      "weight": -10,
+      "access": [
+        { "grant": "admin" }
+      ]
+    }
+  ],
+
+  "javascript": [
+    "~/App_Plugins/Our.Umbraco.MailSettings/mailsettings.service.js",
+    "~/App_Plugins/Our.Umbraco.MailSettings/mailsettings.controller.js"
+  ],
+  "css": [
+    "~/App_Plugins/Our.Umbraco.MailSettings/style.css"
+  ]
+}

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ContentTargetFolders>.</ContentTargetFolders>
+    <Product>Our.Umbraco.MailSettings</Product>
+    <PackageId>Our.Umbraco.MailSettings</PackageId>
+    <Title>Our.Umbraco.MailSettings</Title>
+    <Description>...</Description>
+    <PackageTags>umbraco plugin package</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="11.2.0" />
+    <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="11.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Plugins\Our.Umbraco.MailSettings\**" ExcludeFromSingleFile="true" CopyToPublishDirectory="Always" />
+    <None Include="buildTransitive\**" Pack="true" PackagePath="buildTransitive" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="App_Plugins\Our.Umbraco.MailSettings\lang\en-us.xml" />
+    <None Remove="App_Plugins\Our.Umbraco.MailSettings\mailsettings.controller.js" />
+    <None Remove="App_Plugins\Our.Umbraco.MailSettings\mailsettings.html" />
+    <None Remove="app_plugins\our.umbraco.mailsettings\mailsettings.service.js" />
+    <None Remove="app_plugins\our.umbraco.mailsettings\style.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="App_Plugins\Our.Umbraco.MailSettings\mailsettings.controller.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="App_Plugins\Our.Umbraco.MailSettings\mailsettings.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="App_Plugins\Our.Umbraco.MailSettings\package.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="App_Plugins\Our.Umbraco.MailSettings\style.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
