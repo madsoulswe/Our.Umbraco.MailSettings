@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 using static Lucene.Net.Queries.Function.ValueSources.MultiFunction;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using System.Security.Cryptography;
 using NUglify.Helpers;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Our.Umbraco.MailSettings
 {
@@ -39,7 +39,19 @@ namespace Our.Umbraco.MailSettings
 
 		public ILogger<EnvironmentConfigManipulator> Logger { get; }
 
+		public bool IsJsonProvider() => GetJsonConfigurationProvider() != null;
 
+		
+
+		public JObject GetSmtpSettings(string env = null)
+		{
+			var provider = GetJsonConfigurationProvider();
+
+			return GetJson(provider, env)?["Umbraco"]?["CMS"]?["Global"]?["Smtp"] as JObject;
+		}
+
+		
+		
 		public void SaveSmtpSettings(Dictionary<string, object>values, string env = null)
 		{
 			// Save key to JSON
@@ -92,11 +104,26 @@ namespace Our.Umbraco.MailSettings
 			return writer.Token;
 		}
 
+
+		public bool HasEnvironmentConfig(string env)
+		{
+			var provider = GetJsonConfigurationProvider();
+
+			if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+			{
+				var path = Path.Combine(physicalFileProvider.Root, provider.Source.Path).Replace(".json", $".{env}.json");
+				return File.Exists(path);
+			}
+
+			return false;
+		}
+
+
 		private void SaveJson(JsonConfigurationProvider? provider, JObject? json, string env)
 		{
 			if (provider is null)
 			{
-				return;
+				throw new Exception("No JSON configuration provider found.");
 			}
 
 			lock (_locker)
@@ -136,7 +163,7 @@ namespace Our.Umbraco.MailSettings
 		{
 			if (provider is null)
 			{
-				return null;
+				throw new Exception("No JSON configuration provider found.");
 			}
 
 			lock (_locker)

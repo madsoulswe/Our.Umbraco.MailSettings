@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using Newtonsoft.Json.Linq;
 using Our.Umbraco.MailSettings.Backoffice.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Mail;
+using System.Runtime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +28,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
 using static Lucene.Net.Queries.Function.ValueSources.MultiFunction;
 using static Lucene.Net.Store.Lock;
-using SmtpSettings = Our.Umbraco.MailSettings.Backoffice.Models.SmtpSettings;
+using MailKitSmtpClient = MailKit.Net.Smtp.SmtpClient;
+using MailKitSecureSocketOptions = MailKit.Security.SecureSocketOptions;
+using Umbraco.Cms.Core.Security;
+using NUglify.Helpers;
 
 namespace Our.Umbraco.MailSettings.Backoffice.Api
 {
@@ -39,6 +45,7 @@ namespace Our.Umbraco.MailSettings.Backoffice.Api
 		private readonly IConfigManipulator _configManipulator;
 		private readonly IEnvironmentConfigManipulator _environmentConfigManipulator;
 		private readonly IEmailSender _emailSender;
+		private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 		private GlobalSettings _globalSettings;
 
 		public DashboardController(ILogger<DashboardController> logger,
@@ -46,33 +53,73 @@ namespace Our.Umbraco.MailSettings.Backoffice.Api
 				IOptionsSnapshot<GlobalSettings> options,
 				IConfigManipulator configManipulator,
 				IEnvironmentConfigManipulator environmentConfigManipulator,
-				IEmailSender emailSender
-			)
+				IEmailSender emailSender,
+				IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
 		{
 			_logger = logger;
 			_environment = environment;
 			_configManipulator = configManipulator;
 			_environmentConfigManipulator = environmentConfigManipulator;
 			_emailSender = emailSender;
+			_backOfficeSecurityAccessor = backOfficeSecurityAccessor;
 			_globalSettings = options.Value;
 		}
 
 		public bool GetApi() => true;
 
 		[HttpGet]
+		public bool IsJsonProvider()
+		{
+			return _environmentConfigManipulator.IsJsonProvider();
+		}
+
+		[HttpGet]
+		public bool CanChangeSettings()
+		{
+			
+			if (!_environmentConfigManipulator.IsJsonProvider())
+				return false;
+			
+			var currentHost = _globalSettings.Smtp?.Host;
+
+			//Current smtp-host is empty so we can change settings
+			if (currentHost.IsNullOrWhiteSpace())
+				return true;
+			
+			var environmentConfig = _environmentConfigManipulator.GetSmtpSettings(_environment.EnvironmentName)?.ToObject<global::Umbraco.Cms.Core.Configuration.Models.SmtpSettings>();
+			var defaultConfig = _environmentConfigManipulator.GetSmtpSettings(null)?.ToObject<global::Umbraco.Cms.Core.Configuration.Models.SmtpSettings>();
+
+			//If the current smtp-host is set but is not same as the default/env smtp-host, then we can not change the settings
+			if (_globalSettings.Smtp?.Host != environmentConfig?.Host && _globalSettings.Smtp?.Host != defaultConfig?.Host)
+			{
+				return false;
+			}
+			
+			return true;
+		}
+
+		[HttpGet]
 		public IActionResult GetSettings()
 		{
-			var settings = new SmtpSettings()
+			if(!_environmentConfigManipulator.IsJsonProvider())
+				throw new Exception("The current configuration provider is not JSON. Please change the configuration provider to JSON in order to use this package.");
+
+			var canChangeSettings = CanChangeSettings();
+			
+			var hasEnvironmentConfig = canChangeSettings ? _environmentConfigManipulator.HasEnvironmentConfig(_environment.EnvironmentName) : false;
+			
+
+			var settings = new Our.Umbraco.MailSettings.Backoffice.Models.SmtpSettings()
 			{
-				From = _globalSettings.Smtp.From,
-				Port = _globalSettings.Smtp.Port,
-				Host = _globalSettings.Smtp.Host,
-				SecureSocketOptions = _globalSettings.Smtp.SecureSocketOptions,
-				PickupDirectoryLocation = _globalSettings.Smtp.PickupDirectoryLocation,
-				DeliveryMethod = _globalSettings.Smtp.DeliveryMethod,
-				Username = _globalSettings.Smtp.Username,
-				Password = _globalSettings.Smtp.Password,
-				Environment = _environment.EnvironmentName
+				From = _globalSettings.Smtp?.From,
+				Port = _globalSettings.Smtp?.Port ?? 587,
+				Host = _globalSettings.Smtp?.Host,
+				SecureSocketOptions = _globalSettings.Smtp?.SecureSocketOptions ?? SecureSocketOptions.StartTls,
+				Username = _globalSettings.Smtp?.Username,
+				Password = _globalSettings.Smtp?.Password,
+				Environment = _environment.EnvironmentName,
+				HasEnvironment = hasEnvironmentConfig,
+				CanChangeSettings = canChangeSettings
 			};
 
 			return new JsonResult(settings);
@@ -80,19 +127,22 @@ namespace Our.Umbraco.MailSettings.Backoffice.Api
 
 			
 		[HttpPut]
-		public IActionResult UpdateSettings(SmtpSettings model)
+		public async Task<IActionResult> UpdateSettingsAsync(Models.SmtpSettings model)
 		{
-			var currentSettings = _globalSettings.Smtp;
+			if (!CanChangeSettings())
+				throw new Exception("The current configuration is not appsettings.json. Please change the configuration in order to use this package.");
+
+			if(!model.TestReceiver.IsNullOrWhiteSpace())
+				await TestSettings(model, model.TestReceiver);
+			
 			var settings = JObject.FromObject(new
 			{
-				From = model.From,
-				Port = model.Port,
-				Host = model.Host,
-				SecureSocketOptions = model.SecureSocketOptions,
-				PickupDirectoryLocation = model.PickupDirectoryLocation,
-				DeliveryMethod = model.DeliveryMethod,
-				Username = model.Username,
-				Password = model.Password,
+				model.From,
+				model.Port,
+				model.Host,
+				SecureSocketOptions = model.SecureSocketOptions.ToString(),
+				model.Username,
+				model.Password,
 			}).ToObject<Dictionary<string, object>>();
 
 
@@ -116,6 +166,39 @@ namespace Our.Umbraco.MailSettings.Backoffice.Api
 
 			return new JsonResult(1);
 		}
+
+		private async Task TestSettings(Models.SmtpSettings settings, string receiver)
+		{
+			var message = new MimeMessage()
+			{
+				Subject = "Test mail from Mail Settings",
+				Body = new TextPart(MimeKit.Text.TextFormat.Text)
+				{
+					Text = "Test mail from Mail Settings"
+				},
+				From = { new MailboxAddress(settings.From, settings.From) },
+				To = { new MailboxAddress(receiver, receiver) }
+			};
+			
+			using var client = new MailKitSmtpClient();
+
+			await client.ConnectAsync(
+				settings!.Host,
+				settings.Port,
+				(MailKitSecureSocketOptions)(int)settings.SecureSocketOptions);
+
+			if (!string.IsNullOrWhiteSpace(settings.Username) &&
+				!string.IsNullOrWhiteSpace(settings.Password))
+			{
+				await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
+			}
+			
+			await client.SendAsync(message);
+
+
+			await client.DisconnectAsync(true);
+		}
+		
 	}
 	
 }

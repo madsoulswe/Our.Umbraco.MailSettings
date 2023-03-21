@@ -26,5 +26,7 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/azure-iot-edgehub-deployment-1.2.json" /></VisualStudio></ProjectExtensions>
   
 </Project>

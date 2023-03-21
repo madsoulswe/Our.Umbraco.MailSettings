@@ -4,15 +4,15 @@ angular.module("umbraco").controller("MailSettings.Controller", function ($scope
     vm.securityOptions = [
         { id: 0, value: "None" },
         { id: 1, value: "Auto" },
-        { id: 2, value: "SSLonconnect" },
-        { id: 3, value: "StartTLS" },
-        { id: 4, value: "StartTLSwhenavailable" }
+        { id: 2, value: "SSL on connect" },
+        { id: 3, value: "Start TLS" },
+        { id: 4, value: "Start TLS when available" }
     ];
 
     vm.loading = false;
     vm.savingState = "";
     vm.testState = "";
-    vm.currentSettings = {};
+    vm.message = "";
 
     vm.smtpProperties = [
         {
@@ -51,12 +51,20 @@ angular.module("umbraco").controller("MailSettings.Controller", function ($scope
             label: "Security",
             description: "Allows you to specify what security should be used for the connection sending the email.",
             hideLabel: false,
-            view: "radiobuttons",
+            view: "dropdownFlexible",
             config: {
                 items: vm.securityOptions
             }
         }
     ];
+
+    vm.testField = {
+        alias: "receiver",
+        label: "Test email",
+        description: "It will be used for testing before saving",
+        hideLabel: false,
+        view: "textbox",
+    }
 
     vm.testProperties = [
         {
@@ -87,15 +95,23 @@ angular.module("umbraco").controller("MailSettings.Controller", function ($scope
         vm.loading = true;
 
         mailSettingsService.getSettings().then((data) => {
+            
             vm.currentSettings = data.data;
             for (var s in vm.currentSettings) {
                 for (var p in vm.smtpProperties) {
-                    if (vm.smtpProperties[p].alias === s)
-                        vm.smtpProperties[p].value = vm.currentSettings[s];
+                    if (vm.smtpProperties[p].alias === s) {
+                        if (vm.smtpProperties[p].alias == "secureSocketOptions") {
+                            console.log(vm.smtpProperties[p].view, vm.currentSettings[s]);
+                            vm.smtpProperties[p].value = vm.securityOptions.find(x => x.id == vm.currentSettings[s])?.value ?? "";
+                        } else
+                            vm.smtpProperties[p].value = vm.currentSettings[s];
+                    }
                 }
             }
             vm.loading = false;
-        }, () => {
+        }, (error) => {
+            vm.currentSettings = false;
+            vm.message = error.data.ExceptionMessage;
             vm.loading = false;
         });
         
@@ -107,11 +123,17 @@ angular.module("umbraco").controller("MailSettings.Controller", function ($scope
 
         var settings = {};
         for (var p in vm.smtpProperties) {
-            settings[vm.smtpProperties[p].alias] = vm.smtpProperties[p].value;
+            if (vm.smtpProperties[p].alias == "secureSocketOptions") {
+                settings[vm.smtpProperties[p].alias] = vm.securityOptions.find(x => x.value == vm.smtpProperties[p].value)?.id ?? null;
+            } else {
+                settings[vm.smtpProperties[p].alias] = vm.smtpProperties[p].value;
+            }
+            
         }
 
         var updateSettings = { ...vm.currentSettings, ...settings };
         updateSettings.SaveToCurrent = saveToCurrent;
+        updateSettings.TestReceiver = vm.testField.value;
 
         mailSettingsService.saveSettings(updateSettings).then(() => {
             vm.savingState = "success";

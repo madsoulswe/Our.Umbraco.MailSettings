@@ -11,6 +11,12 @@ namespace Our.Umbraco.MailSettings.Backoffice.Models
 
         public string Environment { get; set; }
 
+		public string TestReceiver { get; set; }
+		
+		public bool HasEnvironment { get; set; }
+
 		public bool SaveToCurrent { get; set; } = false;
+
+		public bool CanChangeSettings { get; set; } = true;
 	}
 }

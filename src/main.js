@@ -93,7 +93,7 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("throw new Error(\"Module build failed: Error: ENOENT: no such file or directory, open 'D:\\\\GIT\\\\Our.Umbraco.MailSettings\\\\index.js'\");\n\n//# sourceURL=webpack:///./index.js?");
+eval("\n\n//# sourceURL=webpack:///./index.js?");
 
 /***/ })
 

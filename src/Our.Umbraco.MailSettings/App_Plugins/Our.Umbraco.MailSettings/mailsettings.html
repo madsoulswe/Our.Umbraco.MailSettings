@@ -1,37 +1,58 @@
 <div ng-controller="MailSettings.Controller as vm">
 
-    <div class="flex justify-between">
-        <div class="flx-b5 mr2">
+    <umb-loader ng-if="vm.loading"></umb-loader>
+    <div class="flex justify-between" ng-if="!vm.loading">
+        <div class="flx-b5 mr2 form-horizontal">
             <umb-box>
 
                 <umb-box-content>
-                    <umb-loader ng-if="vm.loading"></umb-loader>
-                    <form ng-if="!vm.loading" name="doctyperender" class="form-horizontal" novalidate val-form-manager>
+
+                    <p ng-if="vm.message && vm.message.length > 0">{{vm.message}}</p>
+                    <div ng-if="vm.currentSettings != false">
+
+                        <form novalidate val-form-manager>
+
+                            <div class="form-group" ng-repeat="property in  vm.smtpProperties">
+                                <umb-property property="property">
+                                    <umb-property-editor model="property"></umb-property-editor>
+                                </umb-property>
+                            </div>
+
+                            <div class="mt4">
+                                <umb-property property="vm.testField">
+                                    <umb-property-editor model="vm.testField"></umb-property-editor>
+                                </umb-property>
+                            </div>
+                            
+                            
 
 
-                        <div class="form-group" ng-repeat="property in  vm.smtpProperties">
-                            <umb-property property="property">
-                                <umb-property-editor model="property"></umb-property-editor>
-                            </umb-property>
-                        </div>
+                            <div class="tr mt3" ng-if="vm.currentSettings.canChangeSettings">
+                                <umb-button ng-if="vm.currentSettings.hasEnvironment" action="vm.saveSettings()"
+                                            label="Save to default settings"
+                                            type="button"
+                                            state="vm.savingState"
+                                            button-style="info">
+                                </umb-button>
 
+                                <umb-button ng-if="vm.currentSettings.hasEnvironment" action="vm.saveSettings(true)"
+                                            label="Save to environment settings"
+                                            type="button"
+                                            state="vm.savingState"
+                                            button-style="success">
+                                </umb-button>
 
-                        <div class="tr">
-                            <umb-button action="vm.saveSettings()"
-                                        label="Save"
-                                        type="button"
-                                        state="vm.savingState"
-                                        button-style="info">
-                            </umb-button>
+                                <umb-button ng-if="!vm.currentSettings.hasEnvironment" action="vm.saveSettings()"
+                                            label="Save"
+                                            type="button"
+                                            state="vm.savingState"
+                                            button-style="success">
+                                </umb-button>
+                            </div>
+                        </form>
 
-                            <umb-button action="vm.saveSettings(true)"
-                                        label="Save to current environment"
-                                        type="button"
-                                        state="vm.savingState"
-                                        button-style="success">
-                            </umb-button>
-                        </div>
-                    </form>
+                    </div>
+
                 </umb-box-content>
 
 
@@ -42,7 +63,7 @@
             <umb-box>
 
                 <umb-box-content>
-                    <form ng-if="!vm.loading" name="doctyperender" class="form-horizontal" novalidate val-form-manager>
+                    <form novalidate val-form-manager>
                         <div class="form-group" ng-repeat="property in  vm.testProperties">
                             <umb-property property="property">
                                 <umb-property-editor model="property"></umb-property-editor>
@@ -66,5 +87,5 @@
 
 
     </div>
-    
+
 </div>
