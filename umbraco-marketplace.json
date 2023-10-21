@@ -30,6 +30,6 @@
   "PackageType": "Package",
   "PackagesByAuthor": ["Our.Umbraco.SimpleTreeMenu", "Our.Umbraco.AnimateOnScroll"],
   "Tags": ["Mail", "Mailsettings", "Smtp",],
-  "Title": "Mail Settings",
+  "Title": "Mail Settings (Beta)",
   "VideoUrl": ""
 }
