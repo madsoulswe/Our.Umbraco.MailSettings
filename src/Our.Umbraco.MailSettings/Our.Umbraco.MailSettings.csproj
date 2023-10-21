@@ -9,7 +9,13 @@
 		<Product>$(AssemblyName)</Product>
 		<PackageId>$(AssemblyName)</PackageId>
 		<Title>$(AssemblyName)</Title>
-		<Description></Description>
+		<Authors>Dennis Öhman</Authors>
+		<Company>Björnmamman AB Sweden</Company>
+		
+		<PackageProjectUrl>https://github.com/madsoulswe/Our.Umbraco.MailSettings/</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/madsoulswe/Our.Umbraco.MailSettings/</RepositoryUrl>
+		
+		<Description>Mailsettings editor for Umbraco</Description>
 		<PackageTags>umbraco plugin package</PackageTags>
 		<Version>1.0.0</Version>
 		<PackageIcon>icon.png</PackageIcon>
