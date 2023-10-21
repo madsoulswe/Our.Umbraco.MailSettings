@@ -16,6 +16,7 @@ namespace Our.Umbraco.MailSettings
 	{
 		public void Compose(IUmbracoBuilder builder)
 		{
+			builder.Services.Configure<MailSettingsOptions>(builder.Config.GetSection("Our.Umbraco.MailSettings"));
 			builder.Services.AddSingleton<IEnvironmentConfigManipulator, EnvironmentConfigManipulator>();
 			builder.AddNotificationHandler<ServerVariablesParsingNotification, ServerVariablesHandler>();
 		}

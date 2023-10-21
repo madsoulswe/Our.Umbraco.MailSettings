@@ -138,8 +138,9 @@ angular.module("umbraco").controller("MailSettings.Controller", function ($scope
         mailSettingsService.saveSettings(updateSettings).then(() => {
             vm.savingState = "success";
             vm.loadSettings();
-        }, () => {
+        }, (error) => {
             vm.savingState = "error";
+            notificationsService.error(error.data.ExceptionMessage, error.data.StackTrace)
         });
     }
 

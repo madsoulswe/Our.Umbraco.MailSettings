@@ -7,7 +7,7 @@
       "alias": "mailSettings",
       "view": "/App_Plugins/Our.Umbraco.MailSettings/mailsettings.html",
       "sections": [ "settings" ],
-      "weight": -10,
+      "weight": 99,
       "access": [
         { "grant": "admin" }
       ]

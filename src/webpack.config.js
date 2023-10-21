@@ -9,7 +9,7 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: 'Our.Umbraco.MailSettings/App_Plugins/Our.Umbraco.MailSettings/', to: 'Our.Umbraco.MailSettings.WebsiteV10/App_Plugins/Our.Umbraco.MailSettings/' },
+                { from: 'Our.Umbraco.MailSettings/wwwroot/App_Plugins/Our.Umbraco.MailSettings/', to: 'Our.Umbraco.MailSettings.WebsiteV10/App_Plugins/Our.Umbraco.MailSettings/' },
             ],
         }),
     ],
