@@ -1,0 +1,44 @@
+name: Build and Package
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  NAME: Our.Umbraco.MailSettings
+  OUTPUT: ./Output
+  LIBRARY_FOLDER: ./src/Our.Umbraco.MailSettings
+  CONFIG: release
+
+on:
+  push:
+    tags:
+      - "release/*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:      
+      - name: Get Version 
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/release\//}
+        shell: bash
+      
+      - name: checkout
+        uses: actions/checkout@v2
+        
+      - name: Setup NuGet.exe for use with actions
+        uses: NuGet/setup-nuget@v1.0.7        
+        
+      - name: Setup .net core
+        uses: actions/setup-dotnet@v2.1.1
+      
+      - name: Create Our.Umbraco.MailSettings
+        run: dotnet pack ${{ env.LIBRARY_FOLDER }} -c ${{ env.CONFIG }} -o ${{ env.OUTPUT }} /p:version=${{ steps.get_version.outputs.VERSION }} 
+
+      - name: Push Our.Umbraco.MailSettings
+        run: dotnet nuget push ${{ env.OUTPUT }}/${{ env.NAME }}.${{ steps.get_version.outputs.VERSION }}.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+
+      - name: upload-artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Build-Results-${{ steps.get_version.outputs.VERSION }}
+          path: ${{ env.OUTPUT }}/**/*
