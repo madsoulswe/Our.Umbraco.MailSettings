@@ -143,7 +143,7 @@ namespace Our.Umbraco.MailSettings.Backoffice.Api
 				model.Password,
 			}).ToObject<Dictionary<string, object>>();
 
-			if (_mailSettingsOptions.Protected || settings["Password"].ToString().IsNullOrWhiteSpace())
+			if (_mailSettingsOptions.Protected)
 				settings.Remove("Password");
 
 
