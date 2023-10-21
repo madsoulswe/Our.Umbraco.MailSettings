@@ -1,0 +1,35 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json", 
+  "AddOnPackagesRequiredForUmbracoCloud": [],
+  "AlternatePackageNames": [],
+  "AuthorDetails": {
+    "Name": "Björnmamman AB",
+    "Description": "An experienced Swedish web agency",
+    "Url": "https://bjornmamman.se/",
+    "ImageUrl": "https://bjornmamman.se/icon.png",
+    "Contributors": [
+      {
+        "Name": "Dennis Öhman",
+        "Url": "https://github.com/madsoulswe/"
+      }
+    ],
+    "SyncContributorsFromRepository": true
+  },
+  "Screenshots": [
+    {
+      "ImageUrl": "https://raw.githubusercontent.com/madsoulswe/Our.Umbraco.MailSettings/master/preview.jpg"
+    },
+  ],
+  "Category": "Developer Tools",
+  "Description": "A simple mail-settings editor and tester for Umbraco",
+  "DiscussionForumUrl": "https://github.com/madsoulswe/Our.Umbraco.MailSettings/issues",
+  "DocumentationUrl": "https://github.com/madsoulswe/Our.Umbraco.MailSettings",
+  "LicenseTypes": [ "Free" ],
+  "IssueTrackerUrl": "https://github.com/madsoulswe/Our.Umbraco.MailSettings/issues",
+  "IsSubPackageOf": "",
+  "PackageType": "Package",
+  "PackagesByAuthor": ["Our.Umbraco.SimpleTreeMenu", "Our.Umbraco.AnimateOnScroll"],
+  "Tags": ["Mail", "Mailsettings", "Smtp",],
+  "Title": "Mail Settings",
+  "VideoUrl": ""
+}
