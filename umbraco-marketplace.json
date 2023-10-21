@@ -28,8 +28,7 @@
   "IssueTrackerUrl": "https://github.com/madsoulswe/Our.Umbraco.MailSettings/issues",
   "IsSubPackageOf": "",
   "PackageType": "Package",
-  "PackagesByAuthor": ["Our.Umbraco.SimpleTreeMenu", "Our.Umbraco.AnimateOnScroll"],
+  "PackagesByAuthor": ["Our.Umbraco.SimpleTreeMenu", "Our.Umbraco.AnimateOnScroll", "Our.Umbraco.Honeypot"],
   "Tags": ["Mail", "Mailsettings", "Smtp",],
   "Title": "Mail Settings (Beta)",
-  "VideoUrl": ""
 }
