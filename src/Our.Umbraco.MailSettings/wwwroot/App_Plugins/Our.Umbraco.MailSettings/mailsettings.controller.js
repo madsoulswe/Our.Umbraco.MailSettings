@@ -70,7 +70,7 @@ angular.module("umbraco").controller("MailSettings.Controller", function ($scope
         {
             alias: "from",
             label: "From",
-            description: "Specifie the sender, will use default if not set",
+            description: "Specify the sender, will use default/from if not set",
             hideLabel: false,
             view: "textbox"
         },
